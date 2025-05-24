@@ -1,6 +1,7 @@
 import { PaymentProvider } from './providers/paymentProvider'; 
 import { RazorpayProvider } from './providers/index';
 import { ProviderName } from './types';
+import { CashfreeProvider } from './providers/cashfree';
 
 export class PaymentManager {
   private provider: PaymentProvider;
@@ -10,6 +11,9 @@ export class PaymentManager {
       case 'razorpay':
         this.provider = new RazorpayProvider(config);
         break;
+	  case 'cashfree':
+		this.provider = new CashfreeProvider(config);
+		break;
       // case 'paypal':
       //   this.provider = new PayPalProvider(config);
       //   break;

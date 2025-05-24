@@ -27,6 +27,7 @@ export type ChargeResult = {
 export type RefundInput = {
   transactionId: string;
   amount?: number;
+  note?: string;
 }
 
 export type RefundResult = {
@@ -74,4 +75,16 @@ export type SdkErrorResponse = {
   code: string;
   message: string;
   details?: any;
+}
+
+export type CashfreeConfig = {
+  clientId: string
+  clientSecret: string
+  env?: 'PROD' | 'TEST'
+}
+
+export type RazorpayConfig = {
+  keyId: string
+  keySecret: string
+  env?: 'PROD' | 'TEST'
 }
