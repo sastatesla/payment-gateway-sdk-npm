@@ -5,7 +5,7 @@ import config from "./configs/config"
 import eventEmitter from "./utils/logging"
 
 const app = express()
-const port = config.port|| 5002
+const port = config.port || 5002
 
 // set security HTTP headers
 app.use(helmet())
@@ -15,7 +15,6 @@ app.use(express.json())
 
 // parse urlencoded request body
 app.use(express.urlencoded({extended: true}))
-
 
 app.listen(port, async () => {
 	eventEmitter.emit("logging", `Server is up and running on port: ${port}`)
