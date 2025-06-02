@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"resolveJsonModule": true, // Allows importing JSON files as modules
-		"types": ["node", "express","jest"], // Includes type definitions for Node.js and Express
+		"types": ["node", "express", "jest"], // Includes type definitions for Node.js and Express
 		"moduleResolution": "node", // Ensures compatibility with Node.js module resolution
 		"target": "ES2020", // Updates target to a newer ES version for modern features
 		"module": "commonjs", // Keeps the module system as CommonJS

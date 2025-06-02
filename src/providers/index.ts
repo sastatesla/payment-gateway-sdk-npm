@@ -1,3 +1,2 @@
-
-export * from './razorpay';
-export * from './paymentProvider';
+export * from "./razorpay"
+export * from "./paymentProvider"

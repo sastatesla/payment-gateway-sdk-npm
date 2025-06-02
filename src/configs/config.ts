@@ -2,7 +2,7 @@ import dotenv from "dotenv"
 import path from "path"
 import Joi from "joi"
 
-dotenv.config();
+dotenv.config()
 const envVarsSchema = Joi.object()
 	.keys({
 		NODE_ENV: Joi.string()
