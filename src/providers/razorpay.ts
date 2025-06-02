@@ -7,6 +7,7 @@ import {
   PaymentStatusResult,
   ListPaymentsFilter,
   SettlementDetails,
+  RazorpayConfig,
 } from '../types/index'
 import {
   chargeSchema,
@@ -22,11 +23,11 @@ import { APIError } from '../utils/sdkResponse'
 import { PaymentProvider } from './paymentProvider' 
 
 export class RazorpayProvider extends PaymentProvider {
-public async initialize(config: { key_id: string; key_secret: string }): Promise<void> {
+public async initialize(config: RazorpayConfig): Promise<void> {
     try {
         this.razorpay = new Razorpay({
-            key_id: config.key_id,
-            key_secret: config.key_secret,
+            key_id: config.keyId,
+            key_secret: config.keySecret,
         })
     } catch (err: any) {
         throw APIError({
@@ -36,12 +37,12 @@ public async initialize(config: { key_id: string; key_secret: string }): Promise
 }
   private razorpay: Razorpay
 
-  constructor(config: { key_id: string; key_secret: string }) {
+  constructor(config: RazorpayConfig) {
     super()
     try {
       this.razorpay = new Razorpay({
-        key_id: config.key_id,
-        key_secret: config.key_secret,
+        key_id: config.keyId,
+        key_secret: config.keySecret,
       })
     } catch (err: any) {
       throw APIError({
