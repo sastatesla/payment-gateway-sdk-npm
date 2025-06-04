@@ -17,7 +17,7 @@ Cashfree) in your Node.js application.
 ## Installation
 
 ```bash
-npm install npm i @sastatesla/payment-gateway-sdk
+npm install @sastatesla/payment-gateway-sdk
 ```
 
 ---
@@ -153,7 +153,7 @@ on `ChargeInput`, `RefundInput`, `ChargeResult`, etc.
 ## Example
 
 ```typescript
-import {PaymentManager} from "./path/to/PaymentManager"
+import {PaymentManager} from "@sastatesla/payment-gateway-sdk"
 
 async function main() {
 	const config = {keyId: "xxx", keySecret: "yyy"}
