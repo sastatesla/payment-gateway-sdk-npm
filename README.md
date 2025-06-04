@@ -1,144 +1,185 @@
-# Payment SDK
+# PaymentManager SDK
 
-A unified Node.js/TypeScript SDK to handle payments via multiple gateways with a
-single interface. Currently supports:
-
-- ✅ Razorpay
-- ✅ Cashfree
-
-More providers coming soon!
-
----
+A unified interface for integrating multiple payment providers (e.g., Razorpay,
+Cashfree) in your Node.js application.
 
 ## Features
 
-- Unified API for multiple payment gateways
-- Out-of-the-box support for **Razorpay** and **Cashfree**
-- Extensible interface for adding more providers
-- Standardized responses for success and errors
-- Easily switch between gateways and standardize payment flows in your
-  application.
-- Supports charge, refund, status, settlement queries, and payment listing
+- Plug-and-play support for multiple payment providers.
+- Consistent API for charging, refunding, querying payment and settlement
+  status, and listing payments.
+- Easy to extend for other providers (just implement the `PaymentProvider`
+  abstract class).
+- Input validation and error normalization.
 
 ---
 
 ## Installation
 
 ```bash
-npm install payment-sdk
+npm install npm i @sastatesla/payment-gateway-sdk
 ```
 
 ---
 
 ## Usage
 
-### 1. Initialization
+### 1. Initialize the SDK in your code:
 
 ```typescript
-import {PaymentManager} from "payment-sdk"
-
-const config = {
-	key_id: "YOUR_KEY_ID", // For Razorpay
-	key_secret: "YOUR_KEY_SECRET", // For Razorpay
-	client_id: "YOUR_CLIENT_ID", // For Cashfree
-	client_secret: "YOUR_CLIENT_SECRET", // For Cashfree
-	env: "TEST" // For Cashfree: 'TEST' or 'PROD'
-}
-
-const paymentManager = new PaymentManager("razorpay", config)
-// or for Cashfree
-// const paymentManager = new PaymentManager('cashfree', config);
+import {PaymentManager} from "@sastatesla/payment-gateway-sdk"
 ```
 
-### 2. Charge (Create Payment)
+### 2. Configure Provider
+
+Prepare your provider config. For example, for Razorpay:
+
+```typescript
+const razorpayConfig = {
+	keyId: "YOUR_RAZORPAY_KEY_ID",
+	keySecret: "YOUR_RAZORPAY_KEY_SECRET"
+}
+
+const paymentManager = new PaymentManager("razorpay", razorpayConfig)
+```
+
+Or for Cashfree:
+
+```typescript
+const cashfreeConfig = {
+	clientId: "YOUR_CASHFREE_CLIENT_ID",
+	clientSecret: "YOUR_CASHFREE_CLIENT_SECRET",
+	environment: "TEST"
+}
+
+const paymentManager = new PaymentManager("cashfree", cashfreeConfig)
+```
+
+### 3. Charging a User
 
 ```typescript
 const chargeInput = {
-	amount: 50000, // in paise (Razorpay) or rupees*100 (Cashfree)
+	amount: 10000, // in smallest currency unit, e.g., paise
 	currency: "INR",
-	metadata: {
-		customer_id: "user_1",
-		email: "user@example.com",
-		phone: "9876543210"
-	}
+	metadata: {userId: "USER123", notes: "Order #1001"}
 }
 
-const response = await paymentManager.charge(chargeInput)
-
-if (response.success) {
-	// handle success
-} else {
-	// handle error
-}
+const chargeResult = await paymentManager.charge(chargeInput)
+console.log(chargeResult)
 ```
 
-### 3. Refund
+### 4. Refunding a Payment
 
 ```typescript
 const refundInput = {
-	amount: 50000,
-	transactionId: "order_or_payment_id",
-	metadata: {note: "Customer requested"}
+	transactionId: "PAYMENT_ID",
+	amount: 5000
 }
-const response = await paymentManager.refund(refundInput)
+
+const refundResult = await paymentManager.refund(refundInput)
+console.log(refundResult)
 ```
 
-### 4. Get Payment Status
+### 5. Checking Payment Status
 
 ```typescript
-const response = await paymentManager.getPaymentStatus("order_or_payment_id")
+const paymentStatus = await paymentManager.getPaymentStatus("PAYMENT_ID")
+console.log(paymentStatus)
 ```
 
-### 5. List Payments
+### 6. Listing User Payments
 
 ```typescript
-const userPayments = await paymentManager.listUserPayments("user_id")
-const allPayments = await paymentManager.listAllPayments()
+const userPayments = await paymentManager.listUserPayments("USER123", {
+	fromDate: "2024-01-01",
+	toDate: "2024-12-31",
+	status: "captured"
+})
+console.log(userPayments)
+```
+
+### 7. Listing All Payments
+
+```typescript
+const allPayments = await paymentManager.listAllPayments({
+	fromDate: "2024-01-01",
+	toDate: "2024-12-31"
+})
+console.log(allPayments)
+```
+
+### 8. Getting Settlement Details
+
+```typescript
+const settlementDetails =
+	await paymentManager.getSettlementDetails("SETTLEMENT_ID")
+console.log(settlementDetails)
+```
+
+### 9. Checking Refund Status
+
+```typescript
+const refundStatus = await paymentManager.getRefundStatus("REFUND_ID")
+console.log(refundStatus)
 ```
 
 ---
 
-## Response Format
+## Extending for New Providers
 
-All methods return a standardized response:
+1. **Implement `PaymentProvider` Abstract Class**  
+   Create a new provider class extending `PaymentProvider` and implement all
+   required abstract methods.
 
-#### Success
-
-```json
-{
-  "success": true,
-  "status": 200,
-  "data": { ... },
-  "message": "Optional success message"
-}
-```
-
-#### Error
-
-```json
-{
-  "success": false,
-  "status": 400,
-  "code": "internal_server_error",
-  "message": "Error description",
-  "details": { ... }
-}
-```
+2. **Add Switch Case in `PaymentManager`**  
+   Add a case for your new provider in the `PaymentManager` constructor.
 
 ---
 
-## Adding More Providers
+## Error Handling
 
-Implement the `PaymentProvider` interface and add your provider to
-`PaymentManager`.
+All errors are normalized using the `APIError` utility and thrown as exceptions.
+Catch them in your application to handle gracefully.
+
+---
+
+## Types
+
+All methods use strong TypeScript types. Refer to the `types` module for details
+on `ChargeInput`, `RefundInput`, `ChargeResult`, etc.
+
+---
+
+## Example
+
+```typescript
+import {PaymentManager} from "./path/to/PaymentManager"
+
+async function main() {
+	const config = {keyId: "xxx", keySecret: "yyy"}
+	const manager = new PaymentManager("razorpay", config)
+
+	// Charge
+	const charge = await manager.charge({
+		amount: 10000,
+		currency: "INR",
+		metadata: {userId: "1"}
+	})
+	console.log("Charge:", charge)
+
+	// Payment Status
+	const status = await manager.getPaymentStatus(charge.id)
+	console.log("Status:", status)
+}
+
+main().catch(console.error)
+```
 
 ---
 
 ## License
 
 MIT
-
----
 
 ## Contributions
 
