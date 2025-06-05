@@ -35,49 +35,51 @@ import {PaymentManager} from "@sastatesla/payment-gateway-sdk"
 Prepare your provider config. For example, for Razorpay:
 
 ```typescript
-const razorpayConfig = {
-	keyId: "YOUR_RAZORPAY_KEY_ID",
-	keySecret: "YOUR_RAZORPAY_KEY_SECRET"
-}
-
-const paymentManager = new PaymentManager("razorpay", razorpayConfig)
+const payment = PaymentManager.init({
+	provider: "razorpay",
+	config: {
+		keyId: "YOUR_KEY_ID",
+		keySecret: "YOUR_SECRET"
+	}
+})
 ```
 
 Or for Cashfree:
 
 ```typescript
-const cashfreeConfig = {
-	clientId: "YOUR_CASHFREE_CLIENT_ID",
-	clientSecret: "YOUR_CASHFREE_CLIENT_SECRET",
-	environment: "TEST"
-}
-
-const paymentManager = new PaymentManager("cashfree", cashfreeConfig)
+const payment = PaymentManager.init({
+	provider: "cashfree",
+	config: {
+		keyId: "YOUR_KEY_ID",
+		keySecret: "YOUR_SECRET",
+		environment: "TEST"
+	}
+})
 ```
 
 ### 3. Charging a User
 
 ```typescript
-const chargeInput = {
-	amount: 10000, // in smallest currency unit, e.g., paise
-	currency: "INR",
-	metadata: {userId: "USER123", notes: "Order #1001"}
-}
+// Usage
+const paymentResult = await payment.charge(
+  amount: 500,
+  currency: "INR",
+  source: "customer_abc123",
+  metadata: { orderId: "order_001" }
+  );
 
-const chargeResult = await paymentManager.charge(chargeInput)
-console.log(chargeResult)
+console.log("Charge Result:", paymentResult);
 ```
 
 ### 4. Refunding a Payment
 
 ```typescript
-const refundInput = {
-	transactionId: "PAYMENT_ID",
-	amount: 5000
-}
 
-const refundResult = await paymentManager.refund(refundInput)
-console.log(refundResult)
+const refundResult = await paymentManager.refund(
+	transactionId: "PAYMENT_ID",
+)
+console.log(refundResult);
+
 ```
 
 ### 5. Checking Payment Status
@@ -140,40 +142,6 @@ console.log(refundStatus)
 
 All errors are normalized using the `APIError` utility and thrown as exceptions.
 Catch them in your application to handle gracefully.
-
----
-
-## Types
-
-All methods use strong TypeScript types. Refer to the `types` module for details
-on `ChargeInput`, `RefundInput`, `ChargeResult`, etc.
-
----
-
-## Example
-
-```typescript
-import {PaymentManager} from "@sastatesla/payment-gateway-sdk"
-
-async function main() {
-	const config = {keyId: "xxx", keySecret: "yyy"}
-	const manager = new PaymentManager("razorpay", config)
-
-	// Charge
-	const charge = await manager.charge({
-		amount: 10000,
-		currency: "INR",
-		metadata: {userId: "1"}
-	})
-	console.log("Charge:", charge)
-
-	// Payment Status
-	const status = await manager.getPaymentStatus(charge.id)
-	console.log("Status:", status)
-}
-
-main().catch(console.error)
-```
 
 ---
 

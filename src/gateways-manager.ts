@@ -1,63 +1,76 @@
 import {PaymentProvider} from "./providers/paymentProvider"
 import {RazorpayProvider} from "./providers/index"
-import {ProviderName} from "./types"
 import {CashfreeProvider} from "./providers/cashfree"
+import {ProviderName, PaymentManagerConfig} from "./types"
+import {parsePaymentManagerConfig} from "./utils/inputParser"
 
 export class PaymentManager {
-	private provider: PaymentProvider
+	private providerInstance: PaymentProvider
 
-	constructor(providerName: ProviderName, config: any) {
-		switch (providerName) {
+	private constructor(providerInstance: PaymentProvider) {
+		this.providerInstance = providerInstance
+	}
+
+	public static init(config: PaymentManagerConfig): PaymentManager {
+		const validatedConfig = parsePaymentManagerConfig(config)
+
+		switch (config.provider) {
 			case "razorpay":
-				this.provider = new RazorpayProvider(config)
-				break
+				return new PaymentManager(
+					// @ts-ignore
+					new RazorpayProvider(config.config)
+				)
 			case "cashfree":
-				this.provider = new CashfreeProvider(config)
-				break
-			// case 'paypal':
-			//   this.provider = new PayPalProvider(config);
-			//   break;
+				return new PaymentManager(
+					// @ts-ignore
+					new CashfreeProvider(config.config)
+				)
+			// case "paypal":
+			//   return new PaymentManager(new PayPalProvider(config.config));
 			default:
 				throw new Error("Unsupported provider")
 		}
-		this.provider.initialize(config)
 	}
 
-	public async charge(...args: Parameters<PaymentProvider["charge"]>) {
-		return this.provider.charge(...args)
+	public charge(
+		...args: Parameters<PaymentProvider["charge"]>
+	): ReturnType<PaymentProvider["charge"]> {
+		return this.providerInstance.charge(...args)
 	}
 
-	public async refund(...args: Parameters<PaymentProvider["refund"]>) {
-		return this.provider.refund(...args)
+	public refund(
+		...args: Parameters<PaymentProvider["refund"]>
+	): ReturnType<PaymentProvider["refund"]> {
+		return this.providerInstance.refund(...args)
 	}
 
-	public async getPaymentStatus(
+	public getPaymentStatus(
 		...args: Parameters<PaymentProvider["getPaymentStatus"]>
-	) {
-		return this.provider.getPaymentStatus(...args)
+	): ReturnType<PaymentProvider["getPaymentStatus"]> {
+		return this.providerInstance.getPaymentStatus(...args)
 	}
 
-	public async listUserPayments(
+	public listUserPayments(
 		...args: Parameters<PaymentProvider["listUserPayments"]>
-	) {
-		return this.provider.listUserPayments(...args)
+	): ReturnType<PaymentProvider["listUserPayments"]> {
+		return this.providerInstance.listUserPayments(...args)
 	}
 
-	public async listAllPayments(
+	public listAllPayments(
 		...args: Parameters<PaymentProvider["listAllPayments"]>
-	) {
-		return this.provider.listAllPayments(...args)
+	): ReturnType<PaymentProvider["listAllPayments"]> {
+		return this.providerInstance.listAllPayments(...args)
 	}
 
-	public async getSettlementDetails(
+	public getSettlementDetails(
 		...args: Parameters<PaymentProvider["getSettlementDetails"]>
-	) {
-		return this.provider.getSettlementDetails(...args)
+	): ReturnType<PaymentProvider["getSettlementDetails"]> {
+		return this.providerInstance.getSettlementDetails(...args)
 	}
 
-	public async getRefundStatus(
+	public getRefundStatus(
 		...args: Parameters<PaymentProvider["getRefundStatus"]>
-	) {
-		return this.provider.getRefundStatus(...args)
+	): ReturnType<PaymentProvider["getRefundStatus"]> {
+		return this.providerInstance.getRefundStatus(...args)
 	}
 }
