@@ -96,10 +96,14 @@ export class RazorpayProvider extends PaymentProvider {
 		}
 	}
 
-	public async getPaymentStatus(paymentId: string) {
-		validateOrThrow(paymentStatusSchema, {paymentId}, "getPaymentStatus")
+	public async getPaymentStatus(transactionId: string) {
+		validateOrThrow(
+			paymentStatusSchema,
+			{transactionId},
+			"getPaymentStatus"
+		)
 		try {
-			const payment = await this.razorpay.payments.fetch(paymentId)
+			const payment = await this.razorpay.payments.fetch(transactionId)
 			return {...payment}
 		} catch (err: any) {
 			throw APIError({

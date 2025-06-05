@@ -1,6 +1,6 @@
 {
 	"name": "@sastatesla/payment-gateway-sdk",
-	"version": "1.0.8",
+	"version": "1.1.1",
 	"main": "dist/src/index.js",
 	"scripts": {
 		"dev": "nodemon src/app.ts",

@@ -21,6 +21,11 @@ export type ProviderName =
 	| "stripe"
 	| string
 
+export type PaymentManagerConfig = {
+	provider: ProviderName
+	config: any
+}
+
 export type ChargeInput = {
 	amount: number
 	currency: Currency
@@ -40,6 +45,7 @@ export type ChargeResult = {
 export type RefundInput = {
 	transactionId: string
 	amount?: number
+	currency: Currency
 	note?: string
 }
 
@@ -99,5 +105,4 @@ export type CashfreeConfig = {
 export type RazorpayConfig = {
 	keyId: string
 	keySecret: string
-	env?: "PROD" | "TEST"
 }

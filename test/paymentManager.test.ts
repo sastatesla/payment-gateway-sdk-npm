@@ -1,13 +1,16 @@
 import {PaymentManager} from "../src/gateways-manager"
-import {ProviderName} from "../src/types"
+import {ProviderName, ChargeInput, RefundInput} from "../src/types"
 
 describe("PaymentManager", () => {
 	let manager: PaymentManager
 
 	beforeEach(() => {
-		manager = new PaymentManager("razorpay" as ProviderName, {
-			keyId: "test_key",
-			keySecret: "test_secret"
+		manager = PaymentManager.init({
+			provider: "razorpay" as ProviderName,
+			config: {
+				keyId: "test_key",
+				keySecret: "test_secret"
+			}
 		})
 	})
 
@@ -17,7 +20,18 @@ describe("PaymentManager", () => {
 			currency: "INR",
 			source: "test_source",
 			metadata: {userId: "user_1"}
-		})
+		} as ChargeInput)
+
+		expect(result).toHaveProperty("id")
+		expect(result.amount).toBe(1000)
+	})
+
+	it("should refund successfully", async () => {
+		const result = await manager.refund({
+			transactionId: "txn_123",
+			amount: 1000,
+			note: "Test refund"
+		} as RefundInput)
 
 		expect(result).toHaveProperty("id")
 		expect(result.amount).toBe(1000)

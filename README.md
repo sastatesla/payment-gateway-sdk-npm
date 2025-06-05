@@ -1,144 +1,153 @@
-# Payment SDK
+# PaymentManager SDK
 
-A unified Node.js/TypeScript SDK to handle payments via multiple gateways with a
-single interface. Currently supports:
-
-- ✅ Razorpay
-- ✅ Cashfree
-
-More providers coming soon!
-
----
+A unified interface for integrating multiple payment providers (e.g., Razorpay,
+Cashfree) in your Node.js application.
 
 ## Features
 
-- Unified API for multiple payment gateways
-- Out-of-the-box support for **Razorpay** and **Cashfree**
-- Extensible interface for adding more providers
-- Standardized responses for success and errors
-- Easily switch between gateways and standardize payment flows in your
-  application.
-- Supports charge, refund, status, settlement queries, and payment listing
+- Plug-and-play support for multiple payment providers.
+- Consistent API for charging, refunding, querying payment and settlement
+  status, and listing payments.
+- Easy to extend for other providers (just implement the `PaymentProvider`
+  abstract class).
+- Input validation and error normalization.
 
 ---
 
 ## Installation
 
 ```bash
-npm install payment-sdk
+npm install @sastatesla/payment-gateway-sdk
 ```
 
 ---
 
 ## Usage
 
-### 1. Initialization
+### 1. Initialize the SDK in your code:
 
 ```typescript
-import {PaymentManager} from "payment-sdk"
-
-const config = {
-	key_id: "YOUR_KEY_ID", // For Razorpay
-	key_secret: "YOUR_KEY_SECRET", // For Razorpay
-	client_id: "YOUR_CLIENT_ID", // For Cashfree
-	client_secret: "YOUR_CLIENT_SECRET", // For Cashfree
-	env: "TEST" // For Cashfree: 'TEST' or 'PROD'
-}
-
-const paymentManager = new PaymentManager("razorpay", config)
-// or for Cashfree
-// const paymentManager = new PaymentManager('cashfree', config);
+import {PaymentManager} from "@sastatesla/payment-gateway-sdk"
 ```
 
-### 2. Charge (Create Payment)
+### 2. Configure Provider
+
+Prepare your provider config. For example, for Razorpay:
 
 ```typescript
-const chargeInput = {
-	amount: 50000, // in paise (Razorpay) or rupees*100 (Cashfree)
-	currency: "INR",
-	metadata: {
-		customer_id: "user_1",
-		email: "user@example.com",
-		phone: "9876543210"
+const payment = PaymentManager.init({
+	provider: "razorpay",
+	config: {
+		keyId: "YOUR_KEY_ID",
+		keySecret: "YOUR_SECRET"
 	}
-}
-
-const response = await paymentManager.charge(chargeInput)
-
-if (response.success) {
-	// handle success
-} else {
-	// handle error
-}
+})
 ```
 
-### 3. Refund
+Or for Cashfree:
 
 ```typescript
-const refundInput = {
-	amount: 50000,
-	transactionId: "order_or_payment_id",
-	metadata: {note: "Customer requested"}
-}
-const response = await paymentManager.refund(refundInput)
+const payment = PaymentManager.init({
+	provider: "cashfree",
+	config: {
+		keyId: "YOUR_KEY_ID",
+		keySecret: "YOUR_SECRET",
+		environment: "TEST"
+	}
+})
 ```
 
-### 4. Get Payment Status
+### 3. Charging a User
 
 ```typescript
-const response = await paymentManager.getPaymentStatus("order_or_payment_id")
+// Usage
+const paymentResult = await payment.charge(
+  amount: 500,
+  currency: "INR",
+  source: "customer_abc123",
+  metadata: { orderId: "order_001" }
+  );
+
+console.log("Charge Result:", paymentResult);
 ```
 
-### 5. List Payments
+### 4. Refunding a Payment
 
 ```typescript
-const userPayments = await paymentManager.listUserPayments("user_id")
-const allPayments = await paymentManager.listAllPayments()
+
+const refundResult = await paymentManager.refund(
+	transactionId: "PAYMENT_ID",
+)
+console.log(refundResult);
+
+```
+
+### 5. Checking Payment Status
+
+```typescript
+const paymentStatus = await paymentManager.getPaymentStatus("PAYMENT_ID")
+console.log(paymentStatus)
+```
+
+### 6. Listing User Payments
+
+```typescript
+const userPayments = await paymentManager.listUserPayments("USER123", {
+	fromDate: "2024-01-01",
+	toDate: "2024-12-31",
+	status: "captured"
+})
+console.log(userPayments)
+```
+
+### 7. Listing All Payments
+
+```typescript
+const allPayments = await paymentManager.listAllPayments({
+	fromDate: "2024-01-01",
+	toDate: "2024-12-31"
+})
+console.log(allPayments)
+```
+
+### 8. Getting Settlement Details
+
+```typescript
+const settlementDetails =
+	await paymentManager.getSettlementDetails("SETTLEMENT_ID")
+console.log(settlementDetails)
+```
+
+### 9. Checking Refund Status
+
+```typescript
+const refundStatus = await paymentManager.getRefundStatus("REFUND_ID")
+console.log(refundStatus)
 ```
 
 ---
 
-## Response Format
+## Extending for New Providers
 
-All methods return a standardized response:
+1. **Implement `PaymentProvider` Abstract Class**  
+   Create a new provider class extending `PaymentProvider` and implement all
+   required abstract methods.
 
-#### Success
-
-```json
-{
-  "success": true,
-  "status": 200,
-  "data": { ... },
-  "message": "Optional success message"
-}
-```
-
-#### Error
-
-```json
-{
-  "success": false,
-  "status": 400,
-  "code": "internal_server_error",
-  "message": "Error description",
-  "details": { ... }
-}
-```
+2. **Add Switch Case in `PaymentManager`**  
+   Add a case for your new provider in the `PaymentManager` constructor.
 
 ---
 
-## Adding More Providers
+## Error Handling
 
-Implement the `PaymentProvider` interface and add your provider to
-`PaymentManager`.
+All errors are normalized using the `APIError` utility and thrown as exceptions.
+Catch them in your application to handle gracefully.
 
 ---
 
 ## License
 
 MIT
-
----
 
 ## Contributions
 
