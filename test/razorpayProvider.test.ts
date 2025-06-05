@@ -27,7 +27,8 @@ describe("RazorpayProvider", () => {
 	it("should refund a payment successfully", async () => {
 		const result = await provider.refund({
 			transactionId: "txn_123",
-			amount: 1000
+			amount: 1000,
+			currency: "INR"
 		})
 
 		expect(result).toHaveProperty("id")
