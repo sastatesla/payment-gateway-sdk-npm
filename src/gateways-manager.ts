@@ -25,8 +25,8 @@ export class PaymentManager {
 					// @ts-ignore
 					new CashfreeProvider(config.config)
 				)
-			// case "paypal":
-			//   return new PaymentManager(new PayPalProvider(config.config));
+			case "stripe":
+				return new PaymentManager(new StripeProvider(config.config))
 			default:
 				throw new Error("Unsupported provider")
 		}

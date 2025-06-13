@@ -7,3 +7,4 @@ __tests__/
 tsconfig.json
 jest.config.js
 coverage/
+_mocks_/

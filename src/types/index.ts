@@ -106,3 +106,8 @@ export type RazorpayConfig = {
 	keyId: string
 	keySecret: string
 }
+
+export type StripeConfig = {
+	keyId: string
+	accountId: string
+}
